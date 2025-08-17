@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat History</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f0f0;
+            padding: 0;
+            margin: 0;
+        }
+        h1 {
+            text-align: center;
+            padding: 10px;
+            background: #075e54;
+            color: white;
+            margin: 0;
+        }
+        #chat-box {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 10px;
+            height: 80vh;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        .message {
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 8px;
+            max-width: 70%;
+            position: relative;
+            font-size: 14px;
+        }
+        .my-message {
+            align-self: flex-end;
+            background: #dcf8c6;
+        }
+        .other-message {
+            align-self: flex-start;
+            background: #ffffff;
+            border: 1px solid #ddd;
+        }
+        .timestamp {
+            font-size: 0.75em;
+            color: gray;
+            display: block;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Chat History</h1>
+    <div id="chat-box"></div>
+
+    <script>
+        const currentUser = "John"; // Replace with logged-in username
+
+fetch('/chatHistory')
+    .then(response => response.json())
+    .then(data => {
+        const chatBox = document.getElementById('chat-box');
+        chatBox.innerHTML = "";
+        
+        data.forEach(item => {
+            const div = document.createElement('div');
+
+            // Format: 15 Aug 2025, 10:45 AM
+            const formattedTime = new Date(item.time).toLocaleString('en-US', { 
+                day: '2-digit', 
+                month: 'short', 
+                year: 'numeric',
+                hour: '2-digit', 
+                minute: '2-digit', 
+                hour12: true 
+            });
+
+            div.classList.add('message');
+            if (item.username === currentUser) {
+                div.classList.add('my-message');
+            } else {
+                div.classList.add('other-message');
+            }
+
+            div.innerHTML = `
+                <strong>${item.username}</strong><br>
+                ${item.message}
+                <span class="timestamp">${formattedTime}</span>
+            `;
+            chatBox.appendChild(div);
+        });
+
+        // Auto scroll to bottom
+        chatBox.scrollTop = chatBox.scrollHeight;
+    })
+    .catch(error => console.error('Error fetching data:', error));
+
+    </script>
+</body>
+</html>
